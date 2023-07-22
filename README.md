@@ -17,13 +17,13 @@
 ## Предварительный просмотр
 
 ### Светлая тема
-![Светлая тема](https://github.com/oshkov/blog-django/assets/87696868/cefb340a-135c-4dc5-8833-685602f70373)
+![Светлая тема](https://github.com/oshkov/blog-django/assets/87696868/9aa4ac10-dc89-4e78-b6fe-92e641b6686b)
 
-### Теманя тема
-![Теманя тема](https://github.com/oshkov/blog-django/assets/87696868/dcaceaaf-e8de-4a28-8be2-f047dd58c073)
+### Темная тема
+![Темная тема](https://github.com/oshkov/blog-django/assets/87696868/f42bc6ea-b76d-4117-9be0-60eb94eda61a)
 
 ### Переключатель темы
-![Переключатель темы](https://github.com/oshkov/blog-django/assets/87696868/81402a62-d1f1-419c-946f-57a2957f8dde)
+![Переключатель темы](https://github.com/oshkov/blog-django/assets/87696868/cab7327f-f09a-468b-aa92-1b21e9126347)
 
 
 ## Запуск сайта

@@ -1,0 +1,11 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Статья{% endblock %}
+
+{% block content %}
+{% for el in db %}
+    <h1 class="display-3 mt-4">{{ el.title }}</h1>
+    <p class="blockquote-footer mt-3">{{ el.date }}</p>
+    <p class="blockquote">{{ el.text }}</p>
+{% endfor %}
+{% endblock %}

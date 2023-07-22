@@ -1,0 +1,32 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Главная страница{% endblock %}
+
+
+{% block searchBox %}
+<form class="d-flex flex-row" method="POST">
+    {% csrf_token %}
+    <input class="form-control me-2" placeholder="Поиск записи" name="searchText">
+    <button class="btn btn-success me-2">Поиск</button>
+</form>
+{% endblock %}
+
+
+{% block content %}
+{% if db %}
+    <h1 class="display-3 mt-4 offset-lg-3">Блог</h1>
+    {% for el in db %}
+        <div class="card col-lg-6 offset-lg-3 mt-3">
+            <div class="card-body">
+            <h5 class="card-title">{{ el.title }}</h5>
+            <p class="card-date">{{ el.date }}</p>
+            <p class="card-text">{{ el.text }}</p>
+            <a href="post{{ el.id }}" class="btn btn-primary">Открыть пост</a>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <h1 class="display-5 mt-4 offset-lg-3">Постов нет</h1>
+    <a href="/addpost" class="btn btn-primary mt-4 offset-lg-3">Добавить пост</a>
+{% endif %}
+{% endblock %}

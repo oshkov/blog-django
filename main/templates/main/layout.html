@@ -1,0 +1,73 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="{{ theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link type="image/x-icon" href="{% static 'main/img/icon.ico' %}" rel="shortcut icon">
+    <link type="Image/x-icon" href="{% static 'main/img/icon.ico' %}" rel="icon">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <header class="p-3 mb-3 border-bottom bg-body-tertiary">
+        <div class="container-fluid">
+          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a class="me-lg-3 ms-0 ms-lg-1 mb-2 mb-lg-0 d-lg-none d-xl-none" href="/">
+                {% if theme == 'light' %}
+                    <img src="{% static 'main/img/logo-light.png' %}" height="60">
+                {% else %}
+                    <img src="{% static 'main/img/logo-dark.png' %}" height="60">
+                {% endif %}
+            </a>
+
+            <a class="me-lg-3 ms-0 ms-lg-1 mb-2 mb-lg-0 d-none d-lg-block d-xl-block" href="/">
+                {% if theme == 'light' %}
+                    <img src="{% static 'main/img/logo-light.png' %}" height="40">
+                {% else %}
+                    <img src="{% static 'main/img/logo-dark.png' %}" height="40">
+                {% endif %}
+            </a>
+    
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-3 mb-lg-0">
+              <li><a class="nav-link link-body-emphasis {% block navlink-about %}{% endblock %}" href="/about">Подробнее о блоге</a></li>
+              <li><a class="nav-link link-body-emphasis {% block navlink-more %}{% endblock %}" href="/addpost">Добавить свой пост</a></li>
+            </ul>
+    
+            <div class="d-flex flex-row mb-1 mb-lg-0">
+
+                {% block searchBox %}
+                {% endblock %}
+
+                <form class="" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-secondary" type="submit" name="switchTheme">
+                        {% if theme == 'dark' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sun-fill" viewBox="0 0 16 16">
+                            <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+                        </svg>
+                        {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-moon-fill" viewBox="0 0 16 16">
+                            <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+                        </svg>
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+    
+            
+          </div>
+        </div>
+      </header>
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+    
+    <script src="{% static 'main/js/main.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+</body>
+</html>

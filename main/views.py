@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import Posts, Theme
 from .forms import PostsForm
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.http import JsonResponse
 
 # My Functions
 
@@ -57,9 +57,12 @@ def index(request):
         'theme': None
     }
 
-    db = Posts.objects.order_by('-date')
-    searchDB = Posts.objects.none()
-    data['db'] = db
+    selectTheme(request, data)
+
+    # Кнопка смены темы
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        switchTheme(request)
+        return JsonResponse(data)
 
     if request.method == 'POST':
         # Проверка на тип запроса
@@ -77,15 +80,14 @@ def index(request):
             else:
                 return redirect(f'/search={search}/')
 
-        # Кнопка смены темы
-        elif requestType == 'switchTheme':
-            switchTheme(request)
-            return redirect('/')
-
         else:
             pass
 
-    selectTheme(request, data)
+    # Добавляется бд с постами в словарь data
+    db = Posts.objects.order_by('-date')
+    searchDB = Posts.objects.none()
+    data['db'] = db
+
     return render(request, 'main/index.html', data)
 
 
@@ -96,11 +98,37 @@ def indexSearch(request, search):
         'theme': None
     }
 
+    selectTheme(request, data)
+
+    # Кнопка смены темы
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        switchTheme(request)
+        return JsonResponse(data)
+
+    if request.method == 'POST':
+        # Проверка на тип запроса
+        requestType = request.POST
+        keys = []
+        for k in requestType:
+            keys.append(k)
+        requestType = keys[1]
+
+        # Вывод постов из бд при поиске
+        if requestType == 'searchText':
+            search = request.POST.get('searchText')
+            if search == '':
+                return redirect('/')
+            else:
+                return redirect(f'/search={search}/')
+
+        else:
+            pass
+
+    # Добавляется бд с постами в словарь data
     db = Posts.objects.order_by('-date')
     searchDB = Posts.objects.none()
     data['db'] = db
 
-    
     searchByWords = search.split()
     for searchWord in searchByWords:
         for el in db:
@@ -113,32 +141,6 @@ def indexSearch(request, search):
                     pass
     data['db'] = searchDB.order_by('-date')
 
-    if request.method == 'POST':
-        # Проверка на тип запроса
-        requestType = request.POST
-        keys = []
-        for k in requestType:
-            keys.append(k)
-        requestType = keys[1]
-
-        # Вывод постов из бд при поиске
-        if requestType == 'searchText':
-            search = request.POST.get('searchText')
-            if search == '':
-                return redirect('/')
-            else:
-                return redirect(f'/search={search}/')
-
-
-        # Кнопка смены темы
-        elif requestType == 'switchTheme':
-            switchTheme(request)
-            return redirect(f'/search={search}/')
-
-        else:
-            pass
-
-    selectTheme(request, data)
     return render(request, 'main/index.html', data)
 
 
@@ -146,6 +148,13 @@ def about(request):
     data = {
         'theme': None
     }
+
+    selectTheme(request, data)
+
+    # Кнопка смены темы
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        switchTheme(request)
+        return JsonResponse(data)
 
     if request.method == 'POST':
         # Проверка на тип запроса
@@ -159,19 +168,24 @@ def about(request):
         if requestType == 'switchTheme':
             switchTheme(request)
             return redirect('/about/')
-    
-    selectTheme(request, data)
+
     return render(request, 'main/about.html', data)
 
 
-def addarticle(request):
+def addpost(request):
     error = ''
-    form = PostsForm()
     data = {
-        'form': form,
+        'form': None,
         'error': error,
         'theme': None
     }
+
+    selectTheme(request, data)
+
+    # Кнопка смены темы
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        switchTheme(request)
+        return JsonResponse(data)
 
     if request.method == 'POST':
         # Проверка на тип запроса
@@ -193,32 +207,27 @@ def addarticle(request):
         # Кнопка смены темы
         elif requestType == 'switchTheme':
             switchTheme(request)
-            return redirect('/addarticle/')
+            return redirect('/addpost/')
+        
+    data['form'] = PostsForm()
 
-    selectTheme(request, data)
-    return render(request, 'main/addarticle.html', data)
+    return render(request, 'main/addpost.html', data)
 
 
 def fullArticle(request, id):
-    db = Posts.objects.filter(id=id)
-
     data = {
-        'db': db,
+        'db': None,
         'theme': None
     }
 
-    if request.method == 'POST':
-        # Проверка на тип запроса
-        requestType = request.POST
-        keys = []
-        for k in requestType:
-            keys.append(k)
-        requestType = keys[1]
+    selectTheme(request, data)
 
-        # Кнопка смены темы
-        if requestType == 'switchTheme':
-            switchTheme(request)
-            return redirect(f'/post{id}')
+    # Кнопка смены темы
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        switchTheme(request)
+        return JsonResponse(data)
 
     selectTheme(request, data)
+
+    data['db'] = Posts.objects.filter(id=id)
     return render(request, 'main/fullArticle.html', data)

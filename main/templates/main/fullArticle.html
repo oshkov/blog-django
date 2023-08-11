@@ -7,5 +7,27 @@
     <h1 class="display-3 mt-4">{{ el.title }}</h1>
     <p class="blockquote-footer mt-3">{{ el.date }}</p>
     <p class="blockquote">{{ el.text }}</p>
+
+    <!-- Кнопка-триггер модального окна -->
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Удалить пост</button>
+  
+    <!-- Модальное окно -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Вы уверены что хотите удалить этот пост?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+            <form class="" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-danger" name="deletePost" type="submit">Удалить</button>
+            </form>
+            </div>
+        </div>
+        </div>
+    </div>
 {% endfor %}
 {% endblock %}

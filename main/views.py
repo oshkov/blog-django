@@ -59,10 +59,14 @@ def index(request):
 
     selectTheme(request, data)
 
-    # Кнопка смены темы
+    # AJAX запрос
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-        switchTheme(request)
-        return JsonResponse(data)
+        if request.method == 'POST':
+            # Смена темы
+            switchTheme(request)
+            return JsonResponse(data)
+        else:
+            pass
 
     if request.method == 'POST':
         # Проверка на тип запроса
@@ -85,7 +89,6 @@ def index(request):
 
     # Добавляется бд с постами в словарь data
     db = Posts.objects.order_by('-date')
-    searchDB = Posts.objects.none()
     data['db'] = db
 
     return render(request, 'main/index.html', data)
@@ -100,10 +103,14 @@ def indexSearch(request, search):
 
     selectTheme(request, data)
 
-    # Кнопка смены темы
+    # AJAX запрос
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-        switchTheme(request)
-        return JsonResponse(data)
+        if request.method == 'POST':
+            # Смена темы
+            switchTheme(request)
+            return JsonResponse(data)
+        else:
+            pass
 
     if request.method == 'POST':
         # Проверка на тип запроса
@@ -126,8 +133,10 @@ def indexSearch(request, search):
 
     # Добавляется бд с постами в словарь data
     db = Posts.objects.order_by('-date')
-    searchDB = Posts.objects.none()
     data['db'] = db
+
+    # Переменная пустой базы данных для добавления в неё найденных постов
+    searchDB = Posts.objects.none()
 
     searchByWords = search.split()
     for searchWord in searchByWords:
@@ -151,23 +160,14 @@ def about(request):
 
     selectTheme(request, data)
 
-    # Кнопка смены темы
+    # AJAX запрос
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-        switchTheme(request)
-        return JsonResponse(data)
-
-    if request.method == 'POST':
-        # Проверка на тип запроса
-        requestType = request.POST
-        keys = []
-        for k in requestType:
-            keys.append(k)
-        requestType = keys[1]
-
-        # Кнопка смены темы
-        if requestType == 'switchTheme':
+        if request.method == 'POST':
+            # Смена темы
             switchTheme(request)
-            return redirect('/about/')
+            return JsonResponse(data)
+        else:
+            pass
 
     return render(request, 'main/about.html', data)
 
@@ -182,10 +182,12 @@ def addpost(request):
 
     selectTheme(request, data)
 
-    # Кнопка смены темы
+    # AJAX запрос
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-        switchTheme(request)
-        return JsonResponse(data)
+        if request.method == 'POST':
+            # Смена темы
+            switchTheme(request)
+            return JsonResponse(data)
 
     if request.method == 'POST':
         # Проверка на тип запроса
@@ -198,16 +200,15 @@ def addpost(request):
         # Кнопка добавления поста
         if requestType == 'title':
             form = PostsForm(request.POST)
+
+            db = Posts.objects.order_by('-date')
+
             if form.is_valid():
                 form.save()
                 return redirect('/')
-            else:
-                error = 'Форма заполнена неверно'
-
-        # Кнопка смены темы
-        elif requestType == 'switchTheme':
-            switchTheme(request)
-            return redirect('/addpost/')
+   
+        else:
+            pass
         
     data['form'] = PostsForm()
 
@@ -222,10 +223,35 @@ def fullArticle(request, id):
 
     selectTheme(request, data)
 
-    # Кнопка смены темы
+    # AJAX запрос
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-        switchTheme(request)
-        return JsonResponse(data)
+        if request.method == 'POST':
+            # Смена темы
+            switchTheme(request)
+            return JsonResponse(data)
+        else:
+            pass
+
+    if request.method == 'POST':
+        # Проверка на тип запроса
+        requestType = request.POST
+        keys = []
+        for k in requestType:
+            keys.append(k)
+        requestType = keys[1]
+
+        print(requestType)
+
+        # Кнопка добавления поста
+        if requestType == 'deletePost':
+
+            deletedPost = Posts.objects.get(id=id)
+            deletedPost.delete()
+
+            return redirect('/')
+   
+        else:
+            pass
 
     selectTheme(request, data)
 

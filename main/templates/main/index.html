@@ -19,7 +19,11 @@
         <div class="card col-lg-6 offset-lg-3 mt-3">
             <div class="card-body">
             <h5 class="card-title">{{ el.title }}</h5>
-            <p class="card-date">{{ el.date }}</p>
+            {% if el.editDate %}
+                <p class="card-date blockquote-footer mt-3">{{ el.date }} (изменено {{ el.editDate }})</p>
+            {% else %}
+                <p class="card-date blockquote-footer mt-3">{{ el.date }}</p>
+            {% endif %}
             <p class="card-text">{{ el.text }}</p>
             <a href="post{{ el.id }}" class="btn btn-primary">Открыть пост</a>
             </div>

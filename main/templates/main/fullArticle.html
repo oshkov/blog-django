@@ -3,14 +3,24 @@
 {% block title %}Статья{% endblock %}
 
 {% block content %}
-{% for el in db %}
+
+{% for el in post %}
     <h1 class="display-3 mt-4">{{ el.title }}</h1>
-    <p class="blockquote-footer mt-3">{{ el.date }}</p>
+    {% if el.editDate %}
+        <p class="card-date blockquote-footer mt-3">{{ el.date }} (изменено {{ el.editDate }})</p>
+    {% else %}
+        <p class="card-date blockquote-footer mt-3">{{ el.date }}</p>
+    {% endif %}
     <p class="blockquote">{{ el.text }}</p>
 
-    <!-- Кнопка-триггер модального окна -->
-    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Удалить пост</button>
-  
+    <div class="d-flex flex-row mt-5">
+        <a href="/edit{{ el.id }}">
+            <button class="btn btn-warning me-3" name="editPost" type="submit">Редактировать запись</button>
+        </a>
+        <!-- Кнопка-триггер модального окна -->
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Удалить пост</button>    
+    </div>
+      
     <!-- Модальное окно -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -30,4 +40,5 @@
         </div>
     </div>
 {% endfor %}
+
 {% endblock %}

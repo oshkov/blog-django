@@ -3,6 +3,7 @@ from .models import Posts, Theme
 from .forms import PostsForm
 from django.shortcuts import redirect
 from django.http import JsonResponse
+from django.utils import timezone
 
 # My Functions
 
@@ -50,6 +51,7 @@ def switchTheme(request):
 
 # Create your views here.
 
+# Отображение главной старницы
 def index(request):
 
     data = {
@@ -93,7 +95,7 @@ def index(request):
 
     return render(request, 'main/index.html', data)
 
-
+# Отображение главной старницы при поиске
 def indexSearch(request, search):
 
     data = {
@@ -152,7 +154,7 @@ def indexSearch(request, search):
 
     return render(request, 'main/index.html', data)
 
-
+# Отображение страницы "Подробнее о блоге"
 def about(request):
     data = {
         'theme': None
@@ -171,8 +173,8 @@ def about(request):
 
     return render(request, 'main/about.html', data)
 
-
-def addpost(request):
+# Отображение страницы "Добавить пост"
+def addPost(request):
     error = ''
     data = {
         'form': None,
@@ -201,8 +203,6 @@ def addpost(request):
         if requestType == 'title':
             form = PostsForm(request.POST)
 
-            db = Posts.objects.order_by('-date')
-
             if form.is_valid():
                 form.save()
                 return redirect('/')
@@ -212,13 +212,13 @@ def addpost(request):
         
     data['form'] = PostsForm()
 
-    return render(request, 'main/addpost.html', data)
+    return render(request, 'main/addEditPost.html', data)
 
-
+# Отображение страницы с полным содержанием поста
 def fullArticle(request, id):
     data = {
-        'db': None,
-        'theme': None
+        'post': None,
+        'theme': None,
     }
 
     selectTheme(request, data)
@@ -255,5 +255,53 @@ def fullArticle(request, id):
 
     selectTheme(request, data)
 
-    data['db'] = Posts.objects.filter(id=id)
+    data['post'] = Posts.objects.filter(id=id)
     return render(request, 'main/fullArticle.html', data)
+
+# Отображение страницы "Редактирование поста"
+def editPost(request, id):
+    data = {
+        'id': id,
+        'form': None,
+        'theme': None,
+        'post': None
+    }
+    selectTheme(request, data)
+
+    # AJAX запрос
+    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        if request.method == 'POST':
+            # Смена темы
+            switchTheme(request)
+            return JsonResponse(data)
+
+    post = Posts.objects.get(id=id)
+    data['post'] = post
+    data['form'] = PostsForm(instance=post)
+
+    if request.method == 'POST':
+        # Проверка на тип запроса
+        requestType = request.POST
+        keys = []
+        for k in requestType:
+            keys.append(k)
+        requestType = keys[1]
+
+        # Кнопка редактированя поста
+        if requestType == 'title':
+            form = PostsForm(request.POST, instance=post)
+
+            post = Posts.objects.all()
+            print(timezone.now())
+
+            if form.is_valid():
+                form.save() # Сохранение формы
+
+                # Добавление даты изменения в бд
+                update = post.get(id=id)
+                update.editDate = timezone.now()
+                update.save()
+
+                return redirect('/')
+
+    return render(request, 'main/addEditPost.html', data)

@@ -1,0 +1,38 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}
+    {% if id %}
+        Редактирование записи
+    {% else %}
+        Добавление записи
+    {% endif %}
+{% endblock %}
+
+{% block navlink-more %}
+    {% if not id %}
+        text-secondary
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+<div class="col-lg-6 offset-lg-3">
+    {% if id %}
+        <h1 class="display-5 mt-4 mb-4">Редкатирование поста</h1>
+    {% else %}
+        <h1 class="display-5 mt-4 mb-4">Добавление поста</h1>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.title }}<br>
+        {{ form.text }}<br>
+        <span>{{ error }}</span>
+        {% if id %}
+            <button class="btn btn-success add-post" type="submit">Редактировать</button>
+        {% else %}
+            <button class="btn btn-success add-post" type="submit">Добавить запись</button>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

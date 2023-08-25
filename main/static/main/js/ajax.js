@@ -71,3 +71,25 @@ $(document).ready(function() {
         return false;
     });
 });
+
+// Проверка на одинаковое название при добавлении поста
+$(document).ready(function() {
+    $(".add-post").click(function() {
+        title = document.querySelector('[placeholder="Название записи"]').value // Названия поста из input
+        text = document.querySelector('[placeholder="Текст"]').value // Текст из input
+        $.ajax({
+            method: 'post',
+            headers: {'X-CSRFToken': CSRFTOKEN},
+            data: {'add-post-ajax': true, 'title': title, 'text': text}, // Данные, которые отправляются на сервер
+            success: function(data) {
+
+                if (data.newPost === true) { // Редирект на главную страницу в случае если название поста уникальное
+                    window.location.href = '/'
+                } else {
+                    alert('Пост с таким названием уже существует. Название должно быть уникальным.')
+                }
+            }
+        });
+        return false;
+    });
+});

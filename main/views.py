@@ -4,7 +4,6 @@ from .forms import PostsForm
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.utils import timezone
-import json
 
 # My Functions
 
@@ -229,7 +228,7 @@ def addPost(request):
     data = {
         'form': None,
         'error': error,
-        'theme': None
+        'theme': None,
     }
 
     selectTheme(request, data)
@@ -237,9 +236,33 @@ def addPost(request):
     # AJAX запрос
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
         if request.method == 'POST':
+            # Проверка на тип запроса
+            requestType = request.POST
+            keys = []
+            for k in requestType:
+                keys.append(k)
+            requestType = keys[0]
+
             # Смена темы
-            switchTheme(request)
-            return JsonResponse(data)
+            if requestType == 'switch-theme-ajax':
+                switchTheme(request)
+                return JsonResponse(data)
+            
+            elif requestType == 'add-post-ajax':
+                title = request.POST.get('title') # Названия поста из AJAX
+                posts = Posts.objects.all() # Получение постов
+
+                for post in posts:
+                    # Проверка совпадения названия постов с введенным название
+                    if str(post.title) == str(title):
+                        return JsonResponse({'newPost': False})
+                    else:
+                        pass
+
+                # Добавление поста в БД
+                form = PostsForm(request.POST)
+                form.save()
+                return JsonResponse({'newPost': True})
 
     if request.method == 'POST':
         # Проверка на тип запроса
@@ -290,8 +313,6 @@ def fullArticle(request, id):
             keys.append(k)
         requestType = keys[1]
 
-        print(requestType)
-
         # Кнопка добавления поста
         if requestType == 'deletePost':
 
@@ -321,9 +342,31 @@ def editPost(request, id):
     # AJAX запрос
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
         if request.method == 'POST':
+            # Проверка на тип запроса
+            requestType = request.POST
+            keys = []
+            for k in requestType:
+                keys.append(k)
+            requestType = keys[0]
+
             # Смена темы
-            switchTheme(request)
-            return JsonResponse(data)
+            if requestType == 'switch-theme-ajax':
+                switchTheme(request)
+                return JsonResponse(data)
+            
+            elif requestType == 'add-post-ajax':
+                title = request.POST.get('title')
+                posts = Posts.objects.all()
+
+                for post in posts:
+                    if str(post.title) == str(title):
+                        return JsonResponse({'newPost': False})
+                    else:
+                        pass
+
+                form = PostsForm(request.POST)
+                form.save()
+                return JsonResponse({'newPost': True})
 
     post = Posts.objects.get(id=id)
     data['post'] = post
@@ -342,7 +385,6 @@ def editPost(request, id):
             form = PostsForm(request.POST, instance=post)
 
             post = Posts.objects.all()
-            print(timezone.now())
 
             if form.is_valid():
                 form.save() # Сохранение формы

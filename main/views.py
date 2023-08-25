@@ -4,6 +4,7 @@ from .forms import PostsForm
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.utils import timezone
+import json
 
 # My Functions
 
@@ -56,6 +57,7 @@ def index(request):
 
     data = {
         'db': None,
+        'pinned_post': None,
         'theme': None
     }
 
@@ -63,10 +65,51 @@ def index(request):
 
     # AJAX запрос
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+
         if request.method == 'POST':
+            # Проверка на тип запроса
+            requestType = request.POST
+            keys = []
+            for k in requestType:
+                keys.append(k)
+            requestType = keys[0]
+
             # Смена темы
-            switchTheme(request)
-            return JsonResponse(data)
+            if requestType == 'switch-theme-ajax':
+                switchTheme(request)
+                return JsonResponse(data)
+            
+            # Закрепление поста
+            elif requestType == 'pin-post-ajax':
+                id = request.POST.get('id') # ID закрепляемого поста
+                pinnedID = None # Переменная для ID закрепленного поста
+
+                # Проверка на наличие закрепленного поста
+                try:
+                    oldPinned = Posts.objects.get(pinned='pinned')
+                    pinnedID = oldPinned.id
+                except:
+                    pass
+
+                # Проверка на совпадение ID закрепляемого поста и закрепленного, если совпадает, то пост открепляется
+                if str(pinnedID) == str(id):
+                    # Открепление поста
+                    post = Posts.objects.get(id=id)
+                    post.pinned = None
+                    post.save()
+                    return JsonResponse(data)
+                else:
+                    # Обнуление закрепа всех постов в БД
+                    posts = Posts.objects.all()
+                    for post in posts:
+                        post.pinned = None
+                        post.save()
+
+                    # Закрепление выбранного поста в БД
+                    post = Posts.objects.get(id=id)
+                    post.pinned = 'pinned'
+                    post.save()
+                    return JsonResponse(data)
         else:
             pass
 
@@ -88,9 +131,16 @@ def index(request):
 
         else:
             pass
+    
+    # Проверка на наличие закрепленного поста
+    try:
+        pinnedPost = Posts.objects.get(pinned='pinned')
+        data['pinned_post'] = pinnedPost
+    except Exception as ex:
+        pass
 
-    # Добавляется бд с постами в словарь data
-    db = Posts.objects.order_by('-date')
+    # Добавляется бд с постами в словарь data, исключаются закрепленные посты и сортируются по дате (сначала новые)
+    db = Posts.objects.filter(pinned=None).order_by('-date')
     data['db'] = db
 
     return render(request, 'main/index.html', data)

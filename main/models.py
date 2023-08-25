@@ -7,6 +7,7 @@ class Posts(models.Model):
     text = models.TextField('Текст')
     date = models.DateTimeField('Дата публикации', auto_now_add=True)
     editDate = models.DateTimeField('Дата редактирования',null=True)
+    pinned = models.CharField('Закреп', null=True, max_length=6)
 
     def __str__(self):
         return self.title
